@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function HomePage() {
   return (
     <div className="flex min-h-screen items-center justify-center">
@@ -8,13 +10,25 @@ export default function HomePage() {
         <p className="text-lg text-gray-600 mb-8">
           A powerful workflow management platform
         </p>
-        <div className="space-x-4">
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-            Get Started
-          </button>
-          <button className="bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300">
-            Learn More
-          </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
+          <Link href="/workflows" className="block">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 hover:bg-blue-100 transition-colors">
+              <h3 className="text-xl font-semibold text-blue-900 mb-2">Workflows</h3>
+              <p className="text-sm text-blue-700">Manage and monitor your workflows</p>
+            </div>
+          </Link>
+          <Link href="/runs" className="block">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6 hover:bg-green-100 transition-colors">
+              <h3 className="text-xl font-semibold text-green-900 mb-2">Runs</h3>
+              <p className="text-sm text-green-700">Monitor workflow runs and execution history</p>
+            </div>
+          </Link>
+          <Link href="/approvals" className="block">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 hover:bg-yellow-100 transition-colors">
+              <h3 className="text-xl font-semibold text-yellow-900 mb-2">Approvals</h3>
+              <p className="text-sm text-yellow-700">Manage workflow approvals and pending requests</p>
+            </div>
+          </Link>
         </div>
       </div>
     </div>
