@@ -1,13 +1,45 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-// Get environment variables with fallbacks
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Helper function to check if we're on the client-side
+function isClient() {
+  return typeof window !== 'undefined';
+}
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing Supabase environment variables. Please ensure SUPABASE_URL and SUPABASE_ANON_KEY are set.'
-  );
+// Get environment variables with runtime guards
+function getSupabaseConfig() {
+  if (isClient()) {
+    // Client-side configuration
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!url || !anonKey) {
+      throw new Error(
+        'Missing client-side Supabase environment variables. Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set.'
+      );
+    }
+    
+    // Type narrowing - TypeScript now knows these are strings
+    const supabaseUrl: string = url;
+    const supabaseAnonKey: string = anonKey;
+    
+    return { supabaseUrl, supabaseAnonKey };
+  } else {
+    // Server-side configuration
+    const url = process.env.SUPABASE_URL;
+    const anonKey = process.env.SUPABASE_ANON_KEY;
+    
+    if (!url || !anonKey) {
+      throw new Error(
+        'Missing server-side Supabase environment variables. Please ensure SUPABASE_URL and SUPABASE_ANON_KEY are set.'
+      );
+    }
+    
+    // Type narrowing - TypeScript now knows these are strings
+    const supabaseUrl: string = url;
+    const supabaseAnonKey: string = anonKey;
+    
+    return { supabaseUrl, supabaseAnonKey };
+  }
 }
 
 /**
@@ -15,6 +47,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
  * This client can be used for server-side operations
  */
 export function createClient() {
+  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
+  
   return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false, // Disable session persistence for server-side
@@ -28,6 +62,8 @@ export function createClient() {
  * This enables session persistence and auto token refresh
  */
 export function createBrowserClient() {
+  const { supabaseUrl, supabaseAnonKey } = getSupabaseConfig();
+  
   return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: true,
@@ -66,108 +102,16 @@ export interface Database {
           updated_at?: string;
         };
       };
-      workflows: {
-        Row: {
-          id: string;
-          user_id: string;
-          name: string;
-          description?: string;
-          status: 'active' | 'inactive' | 'draft';
-          webhook_id?: string;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          name: string;
-          description?: string;
-          status?: 'active' | 'inactive' | 'draft';
-          webhook_id?: string;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          name?: string;
-          description?: string;
-          status?: 'active' | 'inactive' | 'draft';
-          webhook_id?: string;
-          updated_at?: string;
-        };
-      };
-      runs: {
-        Row: {
-          id: string;
-          workflow_id: string;
-          user_id: string;
-          status: 'running' | 'completed' | 'failed' | 'paused';
-          trigger_type?: string;
-          inputs?: any;
-          outputs?: any;
-          error?: string;
-          started_at: string;
-          completed_at?: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          workflow_id: string;
-          user_id: string;
-          status?: 'running' | 'completed' | 'failed' | 'paused';
-          trigger_type?: string;
-          inputs?: any;
-          outputs?: any;
-          error?: string;
-          started_at?: string;
-          completed_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          workflow_id?: string;
-          user_id?: string;
-          status?: 'running' | 'completed' | 'failed' | 'paused';
-          trigger_type?: string;
-          inputs?: any;
-          outputs?: any;
-          error?: string;
-          completed_at?: string;
-          updated_at?: string;
-        };
-      };
-      approvals: {
-        Row: {
-          id: string;
-          run_id: string;
-          token: string;
-          status: 'pending' | 'approved' | 'rejected';
-          message?: string;
-          approved_by?: string;
-          created_at: string;
-          approved_at?: string;
-        };
-        Insert: {
-          id?: string;
-          run_id: string;
-          token: string;
-          status?: 'pending' | 'approved' | 'rejected';
-          message?: string;
-          approved_by?: string;
-          created_at?: string;
-          approved_at?: string;
-        };
-        Update: {
-          id?: string;
-          run_id?: string;
-          token?: string;
-          status?: 'pending' | 'approved' | 'rejected';
-          message?: string;
-          approved_by?: string;
-          approved_at?: string;
-        };
-      };
+      // Add more table definitions as needed
+    };
+    Views: {
+      // Add view definitions as needed
+    };
+    Functions: {
+      // Add function definitions as needed
+    };
+    Enums: {
+      // Add enum definitions as needed
     };
   };
 }
